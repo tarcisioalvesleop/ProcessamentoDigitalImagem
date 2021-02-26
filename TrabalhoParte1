@@ -1,0 +1,175 @@
+# Extração de Região de Interesse (ROI) Numero 1
+
+import numpy as np
+import cv2
+
+#carregando a imagem
+imagem = cv2.imread("messi.jpg")
+
+#definindo a função que corta a imagem
+def crop (img, x, y, altura, largura):
+    crop_imagem = imagem[y:y+altura, x:x+largura]
+    return crop_imagem
+
+#definindo a função que cola a imagem menor na imagem maior
+def paste(src, dst, x, y):
+    (a, b, c) = dst.shape
+    f1 = a+x
+    f2 = b+y
+    src[x:f1, y:f2] = dst
+    return src;
+
+
+corte = crop (imagem, 336, 287, 163, 49)
+cola = paste(imagem, corte, 280, 100)
+cv2.imshow("Messi", imagem)
+cv2.waitKey(0)
+
+#Trabalhando com Canais de Cores (numero 2)
+import cv2
+import numpy as np
+
+
+soma_b = 0.0
+soma_g = 0.0
+soma_r = 0.0
+
+imagem = cv2.imread("arara.jpg")
+
+altura, largura, _ = imagem.shape
+
+#separando o RGB
+(canalAzul, canalVerde, canalVermelho) = cv2.split(imagem)
+
+cv2.imshow("Imagem Vermelha", canalVermelho)
+cv2.imshow("Imagem Verde", canalVerde)
+cv2.imshow("Imagem Azul", canalAzul)
+cv2.imshow("Imagem Original", imagem)
+
+#percorrendo a imagem e separando os pixels de cada canal
+for i in range(0,altura):
+	for j in range(0,largura):
+		
+		soma_b+=canalAzul[i,j]
+		soma_g+=canalVerde[i,j]
+		soma_r+=canalVermelho[i,j]
+
+#criando vetores
+media=np.zeros(3)	
+bgr=np.zeros(3)
+
+#fazendo a média
+bgr=["azul", "verde", "vermelha"]
+media=[soma_b/(altura*largura), soma_g/(altura*largura), soma_r/(altura*largura)]
+print(bgr, media)
+
+#procurando o maior
+maior = 0
+j = 0
+while j < 3 :
+
+	if media[j] >= media[maior]:
+	    maior = j
+	j = j + 1
+
+print("A cor que mais predomina na imagem é ",bgr[maior], "com a média de cor ",media[maior])
+
+cv2.waitKey(0)
+
+# Junte pessoas usando Alpha Blending (Numero 3)
+
+import cv2
+import numpy as np
+
+#carregando as duas imagens
+foto1 = cv2.imread("fig1.jpg")
+foto2 = cv2.imread("fig2.jpg")
+
+#fazendo com que as duas imagens tenham as mesma dimensões
+altura, largura, _ = foto1.shape
+foto2 = cv2.resize(foto2, (largura, altura))
+
+#fazendo a "fusão"
+result = cv2.addWeighted(foto1, 0.5, foto2, 0.5, 0) #soma das duas imagens
+
+#reduzindo o tamanho da imagem
+alturaresult, larguraresult,_= result.shape
+result = cv2.resize(result, (int(larguraresult*0.25), int(alturaresult*0.25)) )
+
+#suavizando a imagem
+result = cv2.GaussianBlur(result,(5,5),0)
+
+#leitura
+cv2.imshow("Resultado", result)
+cv2.waitKey(0)
+
+# Histograma de Cores (Numero 4)
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+#carregando imagem preto e branco
+img = cv2.imread("torrePisa.jpg", 0)
+
+#carregando imagem colorida
+imagem = cv2.imread ("Lenna.png")
+
+#HISTOGRAMA PRETO E BRANCO
+#plotando o histograma preto e branco
+plt.hist(img.ravel(), 256, [0, 255]) #ravel pega a matriz 2D  e linha a linha forma vetor de uma dimensão
+
+cv2.imshow("Imagem Preto e Branco", img)
+#mostrando o histograma da imagem preto e branco
+plt.title('Histograma imagem preto e branco')
+plt.show()
+
+#HISTOGRAMA COLORIDO
+#criando uma lista para fazer o histograma de cada canal
+color = ('b', 'g', 'r')
+
+for i, col in enumerate (color):
+
+  #definindo o histograma
+  histograma = cv2.calcHist([imagem], [i], None, [256], [0, 256]) #(imagem, identificador, máscara, bin, intervalo de tom)
+  plt.plot(histograma, color = col)
+  plt.xlim([0, 256])
+
+cv2.imshow("Imagem Colorida", imagem)
+#mostrando o histograma da imagem colorida
+plt.title('Histograma imagem colorida')
+plt.show()
+
+cv2.waitKey(0) 
+cv2.destroyAllWindows()
+
+
+#Adição de Imagens (Numero 5)
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+#função para fazer a soma de duas imagens
+def somandoImagem():
+
+  #carregando as duas imagens
+  imagem1 = cv2.imread("nuvem.jpg")
+  imagem2 = cv2.imread("marca.png")
+ 
+  #garantindo que as duas imagens tenham as mesmas dimensões
+  h, w, _ = imagem1.shape
+  imagem2 = cv2.resize(imagem2, (w, h))
+
+  #soma ponderada de duas imagens
+  addedImage = cv2.addWeighted(imagem1, 0.5, imagem2, 0.5, 0)
+  return addedImage
+
+soma = somandoImagem()
+cv2.imshow("Resultado Final", soma)
+cv2.waitKey(0)
+
+
+
+
+
